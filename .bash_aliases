@@ -3,8 +3,17 @@
 # go drunk, you're home
 alias ~="cd ~ && l"
 
+# easy to swap out if needed
+alias edit="subl"
+
 # link to this file; reloads after edit
 alias balias="nano ~/.bash_aliases && source ~/.bash_aliases"
+
+# also now with nanorc
+alias nanorc="edit ~/.nanorc"
+
+# fuck it, why not
+alias php.ini="edit /etc/php.ini"
 
 # show some logs
 alias taila="tail -f /var/log/apache2/access_combined.log"
@@ -12,43 +21,63 @@ alias taile="tail -f /var/log/apache2/error.log"
 alias tailc="tail -f /var/log/cron.log"
 
 # list all
-alias l="ls -halG"
 alias lx='ls -lXB'         #  Sort by extension.
 alias lk='ls -lSr'         #  Sort by size, biggest last.
 alias lt='ls -ltr'         #  Sort by date, most recent last.
 alias lc='ls -ltcr'        #  Sort by/show change time,most recent last.
 alias lu='ls -ltur'        #  Sort by/show access time,most recent last.
 
+# colored tree and paginated
+alias tree='tree -Csuh | more'
+
+#-------------------------------------------------------------
+# Tailoring 'less'
+#-------------------------------------------------------------
+
+alias more='less'
+export PAGER=less
+export LESSCHARSET='latin1'
+export LESSOPEN='|/usr/bin/lesspipe.sh %s 2>&-'
+                # Use this if lesspipe.sh exists.
+export LESS='-i -N -w  -z-4 -g -e -M -X -F -R -P%t?f%f \
+:stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
+
+# LESS man page colors (makes Man pages more readable).
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+
 # Find a file with a pattern in name:
 function ff { find . -type f -iname '*'"$*"'*' -ls ; }
 
 # change directory and list
-function cd { builtin cd "${1:-}"; l ;}
+function cd { builtin cd "${1:-}"; ls ;}
 
 # redo last command with sudo
-function f { sudo !-2 ; }
-
-# Find a file with pattern $1 in name and Execute $2 on it:
-function fe { find . -type f -iname '*'"${1:-}"'*' \
--exec ${2:-file} {} \;  ; }
+alias f='sudo "$BASH" -c "$(history -p !!)"'
 
 # go to newly created directory
 function mkcd
 {
-	mkdir -p $1 && eval cd $1
+  mkdir -p $1 && eval cd $1
 }
+alias mkdir='mkdir -p'
 
 # back a directory
 alias b="cd .."
 
 # i can never remember this fucking thing
-alias untar="tar -zxvf $1"
+alias untar="tar -zxvf"
 
 # edit bashrc
-alias bashrc="nano ~/.bashrc && source ~/.bashrc"
+alias bashrc="edit ~/.bashrc && source ~/.bashrc"
 
 # edit hosts
-alias hosts="sudo nano /etc/hosts"
+alias hosts="sudo edit /etc/hosts"
 
 # adds some text in the terminal frame
 function xtitle
@@ -80,7 +109,7 @@ alias findbig="find . -type f -exec ls -s {} \; | sort -n -r | head -5"
 # Grep for a bash process
 alias psg="ps -aux | grep bash"
 
-# Make basic commands interactive, and verbose
+# Make basic commands verbose
 alias cp="cp -v"
 alias rm="rm -v"
 alias mv="mv -v"
@@ -89,8 +118,11 @@ alias grep="grep -i"  # ignore case
 # Easy to use aliases for frequently used commands
 alias x="exit"
 alias s="sudo -s"
+
+# ubuntu items; need a conditional here
 alias update="sudo apt-get update"
 alias upgrade="sudo apt-get upgrade -y"
+alias upgrate="update && upgrade"
 
 # pretty print of path
 alias path='echo -e ${PATH//:/\\n}'
@@ -122,7 +154,7 @@ function gpl {
 }
 
 # edit mac php.ini (update with your own)
-alias php.ini="subl /usr/local/etc/php/5.4/php.ini"
+alias php.ini="edit /usr/local/etc/php/5.4/php.ini"
 
 # Git branch in prompt.
 function parse_git_branch {
@@ -138,15 +170,19 @@ function root_down {
   fi
 }
 
+function wtf() {
+  echo "$1"
+}
+
+# delete recursive
+function rmr () {
+	find . -name "$1" -type f -delete -exec \
+	echo $(tput setaf 1)"deleted >"$(tput setaf 2) {} \; ;
+	l;
+}
+
 # helpful prompt displays: (server) user [path] (git branch) >
-# remember to update the server with the proper value
-# v 1
-# export PS1="\[$(tput bold)\]\[$(tput setaf 8)\](\h)\[$(tput sgr0)\] \e[36m\]\u [\[\e[35m\]\w\[\e[36m\]] \[$(tput setaf 3)\]>\[$(tput setaf 9)\] "
-# v 2
-# export PS1="🖥 $(tput bold)$(tput setaf 2) slim $(tput setaf 1)📆 $(date +%I:%M) $(tput setaf 6)😶 \u $(tput setaf 5)🏚 \w $(tput setaf 2)\$(parse_git_branch) $(tput setaf 3)
-# \$(root_down) >"
-# v 3
-export PS1="🖥 $(tput bold)$(tput setaf 2) slim $(tput setaf 1)📆  \$(date +%I:%M) $(tput setaf 5)🏚 \w  $(tput setaf 2)\$(parse_git_branch) $(tput setaf 3)
+export PS1="🖥 $(tput bold)$(tput setaf 2) \h $(tput setaf 1)📆  \$(date +%I:%M) $(tput setaf 5)🏚 \w  $(tput setaf 2)\$(parse_git_branch) $(tput setaf 3)
 \$(root_down)  $(tput sgr0)"
 
 # pretty ls colors
@@ -155,3 +191,12 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 
 # clear out known_hosts file
 alias known_hosts="mv ~/.ssh/known_hosts ~/.ssh/known_hosts.bak"
+
+#############################################
+# very personal aliases that probably 		#
+# will be useless for anyone else			#
+# ###########################################
+
+alias p="cd ~/projects/"
+alias l="\ls -a"
+alias ls="\ls -al"
