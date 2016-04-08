@@ -158,7 +158,7 @@ alias php.ini="edit /usr/local/etc/php/5.4/php.ini"
 
 # Git branch in prompt.
 function parse_git_branch {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/🐱 \1/'
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/🐱 \1/'
 }
 
 function root_down {
@@ -182,7 +182,7 @@ function rmr () {
 }
 
 # helpful prompt displays: (server) user [path] (git branch) >
-export PS1="🖥 $(tput bold)$(tput setaf 2) \h $(tput setaf 1)📆  \$(date +%I:%M) $(tput setaf 5)🏚 \w  $(tput setaf 2)\$(parse_git_branch) $(tput setaf 3)
+export PS1="🖥 $(tput bold)$(tput setaf 2) \h $(tput setaf 1)📆  \$(date +%I:%M) $(tput setaf 5)🏚 \w $(tput setaf 2)\$(parse_git_branch) $(tput setaf 3)
 \$(root_down)  $(tput sgr0)"
 
 # pretty ls colors
